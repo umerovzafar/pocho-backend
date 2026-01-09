@@ -2,6 +2,7 @@ import uvicorn
 import os
 import socket
 from app.core.config import settings
+from dotenv import load_dotenv
 
 def get_local_ip():
     """Получение локального IP-адреса для доступа по сети"""
@@ -14,9 +15,10 @@ def get_local_ip():
         return ip
     except Exception:
         return None
-
 if __name__ == "__main__":
     # Получаем host и port из переменных окружения или используем значения по умолчанию
+    load_dotenv()
+
     host = os.getenv("HOST", "127.0.0.1")  # По умолчанию localhost для браузера
     port = int(os.getenv("PORT", 8000))
     

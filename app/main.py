@@ -10,7 +10,6 @@ from pathlib import Path
 from app.core.config import settings
 from app.database import engine, Base
 from app.api.v1 import api_router
-# Импортируем все модели для регистрации в Base.metadata
 from app.models import (
     User, VerificationCode, BlacklistedToken,
     UserExtended, UserProfile, UserFavorite,
@@ -32,14 +31,12 @@ from app.core.security_middleware import (
     ErrorHandlingMiddleware
 )
 
-# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-# Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -103,8 +100,6 @@ subdirs = [
 for subdir in subdirs:
     (upload_dir / subdir).mkdir(parents=True, exist_ok=True)
 
-# Монтируем статические файлы
-# Используем /uploads как путь для доступа к файлам
 app.mount("/uploads", StaticFiles(directory=str(upload_dir)), name="uploads")
 
 
@@ -120,13 +115,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         msg = error.get("msg", "Validation error")
         error_type = error.get("type", "")
         
-        # Улучшаем сообщения для конкретных типов ошибок
         if error_type == "value_error.missing":
             errors.append(f"Поле '{field_path}' обязательно для заполнения")
         elif error_type == "type_error.str":
             errors.append(f"Поле '{field_path}' должно быть строкой")
         elif "phone_number" in field_path.lower() and "value_error" in error_type:
-            # Специальная обработка для ошибок валидации номера телефона
             if "uzbek" in str(msg).lower() or "998" in str(msg).lower():
                 errors.append(f"Неверный формат номера телефона. Используйте формат: +998XXXXXXXXX (например: +998900000000)")
             else:
